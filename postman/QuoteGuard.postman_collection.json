@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "QuoteGuard API - Agent-Ready Financial Gateway",
+    "description": "Colección oficial para probar simulación, reglas de gobernanza para agentes de IA y emisión de presupuestos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "agent_key",
+      "value": "qg_agent_test_12345"
+    },
+    {
+      "key": "admin_key",
+      "value": "qg_admin_live_98765"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health"
+      }
+    },
+    {
+      "name": "2. AI Agent - Simular Cotización (Dry Run)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{agent_key}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"client_name\": \"Constructora Andes SpA\",\n  \"buffer_percent\": 10,\n  \"tax_percent\": 19,\n  \"dry_run\": true,\n  \"items\": [\n    { \"description\": \"Estructura metálica y soldadura\", \"quantity\": 1, \"unit_cost\": 2500000 },\n    { \"description\": \"Instalación sanitaria\", \"quantity\": 2, \"unit_cost\": 450000 }\n  ]\n}"
+        },
+        "url": "{{base_url}}/api/v1/quotes"
+      }
+    },
+    {
+      "name": "3. AI Agent - Intento Bloqueado por Monto Alto (403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{agent_key}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"client_name\": \"Inmobiliaria Sur\",\n  \"buffer_percent\": 10,\n  \"tax_percent\": 19,\n  \"dry_run\": false,\n  \"items\": [\n    { \"description\": \"Obra gruesa ampliación\", \"quantity\": 1, \"unit_cost\": 6000000 }\n  ]\n}"
+        },
+        "url": "{{base_url}}/api/v1/quotes"
+      }
+    },
+    {
+      "name": "4. Admin - Confirmar y Guardar Cotización (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{admin_key}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"client_name\": \"Constructora Andes SpA\",\n  \"buffer_percent\": 10,\n  \"tax_percent\": 19,\n  \"dry_run\": false,\n  \"items\": [\n    { \"description\": \"Estructura metálica y soldadura\", \"quantity\": 1, \"unit_cost\": 2500000 },\n    { \"description\": \"Instalación sanitaria\", \"quantity\": 2, \"unit_cost\": 450000 }\n  ]\n}"
+        },
+        "url": "{{base_url}}/api/v1/quotes"
+      }
+    },
+    {
+      "name": "5. Listar Cotizaciones Guardadas",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-API-Key", "value": "{{admin_key}}" }
+        ],
+        "url": "{{base_url}}/api/v1/quotes"
+      }
+    }
+  ]
+}
